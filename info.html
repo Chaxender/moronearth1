@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hakkımda</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            animation: fade-in 1s ease-out forwards;
+        }
+        .heading {
+            text-align: center;
+            color: #007BFF;
+            font-size: 32px;
+        }
+        .content {
+            opacity: 0;
+            animation: slide-in 1s ease-out forwards;
+            animation-delay: 0.5s;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+        @keyframes fade-in {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        @keyframes slide-in {
+            0% { opacity: 0; transform: translateY(-20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 class="heading">Hakkımda 🚀</h1>
+    <div class="content">
+        <p>Merhaba, ben Monstou namıdeğer Kıvanç. 🌟 Öğrenciyim, yazılımı hobi olarak çalışıyorum. 💼 [Monstou İnc.] adında bir stüdyo adım var ama şimdilik tek çalışıyorum.</p>
+        <p>Uzmanlık alanlarım arasında [Yazılım, Grafik Tasarım, Editörlük, Fotoğrafçılık], hobilerim arasında ise [Yazılım] bulunmaktadır. 🎨 Ayrıca, arayüz stilleri ve python, html, css, js gibi kodlama dillerinde de deneyimim bulunmaktadır.</p>
+        <p>İletişim için benimle şu e-posta adresinden iletişime geçebilirsiniz: [kivancsadi20@gmail.com] 📧</p>
+    </div>
+</div>
+
+</body>
+</html>

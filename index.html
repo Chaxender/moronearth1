@@ -3,55 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moron</title>
+    <title>Moron Navigasyon</title>
     <link rel="icon" href="./img/logo.png" type="image/png">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-routing-machine/3.2.12/leaflet-routing-machine.css" />
     <style>
-        body { font-family: sans-serif; margin: 0; padding: 0; }
-        #map { height: 100vh; }
-        #search { position: absolute; top: 10px; left: 100px; z-index: 1000; background-color: white; padding: 10px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        #search input { width: calc(100% - 80px); padding: 5px; margin-right: 10px; border: none; border-radius: 5px; }
-        #search button { padding: 5px 10px; border: none; border-radius: 5px; background-color: #007BFF; color: white; cursor: pointer; }
-        #search button:hover { background-color: #0056b3; }
-        #logo { position: absolute; top: 10px; right: 10px; z-index: 1000; }
-        #logo img { width: 100px; height: 100px; }
-        #info { position: absolute; bottom: 10px; left: 10px; z-index: 1000; background-color: rgba(255, 255, 255, 0.8); padding: 10px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: none; }
-        #info h2 { margin-top: 0; }
-        #info p { margin-bottom: 5px; }
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background-color: #f8f9fa; 
+            overflow-x: hidden; 
+        }
+        .container-fluid { 
+            padding: 0; 
+            margin: 0; 
+        }
+        #map { 
+            height: calc(100vh - 56px); /* Navbar yüksekliği kadar azalt */
+        }
+        #search { 
+            position: absolute; 
+            top: 23cm; 
+            right: 20px; 
+            z-index: 1000; 
+            background-color: rgba(255, 255, 255, 0.8); 
+            padding: 10px; 
+            border-radius: 20px; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+            animation: slide-in-top 0.5s ease-out forwards; 
+        }
+        #search input[type="text"] { 
+            width: 200px; 
+            padding: 10px; 
+            border: none; 
+            border-radius: 20px; 
+            margin-right: 10px; 
+            font-size: 16px; 
+        }
+        #search button { 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 20px; 
+            background-color: #007BFF; 
+            color: white; 
+            cursor: pointer; 
+            font-size: 16px; 
+        }
+        #logo { 
+            position: absolute; 
+            top: 50%; /* Navbar yüksekliğinin yarısı kadar yukarıda */
+            right: 1cm; 
+            transform: translateY(-50%); /* Logoyu dikey olarak ortala */
+            z-index: 1000; 
+            animation: fade-in 1s ease-out forwards; 
+        }
+        #logo img { 
+            width: 100px; 
+            height: 100px;
+            transform: rotateY(0deg); /* Initial rotation */
+            transition: transform 1s; /* Smooth transition for rotation */
+        }
+        #info { 
+            position: absolute; 
+            bottom: 20px; 
+            left: 20px; 
+            z-index: 1000; 
+            background-color: rgba(255, 255, 255, 0.8); 
+            padding: 20px; 
+            border-radius: 20px; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+            display: none; 
+            animation: slide-in-bottom 0.5s ease-out forwards; 
+        }
+        #info h2 { 
+            margin-top: 0; 
+            margin-bottom: 20px; 
+            font-size: 20px; 
+        }
+        #info p { 
+            margin-bottom: 10px; 
+            font-size: 16px; 
+        }
+        @keyframes slide-in-top { 
+            0% { 
+                transform: translateY(-100%); 
+            } 
+            100% { 
+                transform: translateY(0); 
+            } 
+        }
+        @keyframes slide-in-bottom { 
+            0% { 
+                transform: translateY(100%); 
+            } 
+            100% { 
+                transform: translateY(0); 
+            } 
+        }
+        @keyframes fade-in { 
+            0% { 
+                opacity: 0; 
+            } 
+            100% { 
+                opacity: 1; 
+            } 
+        }
     </style>
 </head>
 <body>
 
-<div id="search">
-    <input type="text" id="searchInput" placeholder="Şehir, İlçe veya Ülke">
-    <button onclick="searchLocation()">Git</button>
-</div>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
 
-<div id="logo">
-    <img src="./img/logo.png" alt="Logo">
-</div>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="#">Anasayfa <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="./info.html">Hakkımızda</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="./iletişim.html">İletişim</a>
+      </li>
+      <div id="logo">
+        <img src="./img/logo.png" alt="Logo" id="logoImg">
+      </div>
+    </ul>
+  </div>
+</nav>
 
-<div id="map"></div>
+<div class="container-fluid">
+    <div id="map"></div>
 
-<div id="info">
-    <h2>Yer Bilgileri</h2>
-    <p id="locationName"></p>
-    <p id="coordinates"></p>
-    <p id="type"></p>
+    <div id="search">
+        <input type="text" id="searchInput" placeholder="Şehir, İlçe veya Ülke">
+        <button class="btn btn-primary" onclick="searchLocation()">Git</button>
+    </div>
+
+    <div id="info">
+        <h2>Yer Bilgileri</h2>
+        <p id="locationName"></p>
+        <p id="coordinates"></p>
+        <p id="type"></p>
+        <p id="distance"></p> <!-- Mesafe bilgisi -->
+    </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.min.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
 
 <script>
     var map = L.map('map').setView([38.4127, 27.1384], 10);
     
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
+        attribution: '&copy; Monstou contributors'
     }).addTo(map);
 
     var marker = L.marker([38.4127, 27.1384]).addTo(map);
+
+    var trafficLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; Monstou contributors, Traffic by <a href="https://www.openstreetmap.org/about/verkehr">Monstou</a>'
+    }).addTo(map);
 
     function searchLocation() {
         var searchText = document.getElementById('searchInput').value;
@@ -68,6 +186,16 @@
                     map.setView(center, 10);
                     marker.setLatLng(center);
                     showLocationInfo(result);
+                    // En kısa rotayı hesapla
+                    L.Routing.control({
+                        waypoints: [
+                            L.latLng(38.4127, 27.1384), // Başlangıç noktası
+                            L.latLng(result.lat, result.lon) // Hedef nokta
+                        ]
+                    }).addTo(map);
+                    // Logo döndürme animasyonu
+                    var logoImg = document.getElementById('logoImg');
+                    logoImg.style.transform = "rotateY(360deg)";
                 } else {
                     alert("Konum bulunamadı.");
                 }
@@ -90,6 +218,35 @@
 
         infoElement.style.display = 'block';
     }
+
+    function toggleTraffic() {
+        if (map.hasLayer(trafficLayer)) {
+            map.removeLayer(trafficLayer);
+        } else {
+            trafficLayer.addTo(map);
+        }
+    }
+
+    // Sağ tıklama olayı dinleyicisi
+    map.on('contextmenu', function(ev) {
+        var markerPosition = ev.latlng; // Tıklanan noktanın koordinatları
+        var userPosition = marker.getLatLng(); // Kullanıcının konumunun koordinatları
+
+        var distance = userPosition.distanceTo(markerPosition); // İki nokta arasındaki mesafe (metre cinsinden)
+        var distanceInKm = (distance / 1000).toFixed(2); // Mesafeyi kilometre cinsine çevirip 2 ondalık basamağa yuvarla
+
+        var distanceElement = document.getElementById('distance');
+        distanceElement.textContent = "Mesafe: " + distanceInKm + " km"; // Mesafe bilgisini ekrana yazdır
+    });
+
+    // "Enter" tuşuna basılınca da arama yap
+    document.getElementById("searchInput").addEventListener("keyup", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            searchLocation();
+        }
+    });
+
 </script>
 
 </body>
