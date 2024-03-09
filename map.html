@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moron</title>
+    <link rel="icon" href="./logo.png" type="image/png">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        body { font-family: sans-serif; margin: 0; padding: 0; }
+        #map { height: 100vh; }
+        #search { position: absolute; top: 10px; left: 100px; z-index: 1000; background-color: white; padding: 10px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        #search input { width: calc(100% - 80px); padding: 5px; margin-right: 10px; border: none; border-radius: 5px; }
+        #search button { padding: 5px 10px; border: none; border-radius: 5px; background-color: #007BFF; color: white; cursor: pointer; }
+        #search button:hover { background-color: #0056b3; }
+        #logo { position: absolute; top: 10px; right: 10px; z-index: 1000; }
+        #logo img { width: 100px; height: 100px; }
+        #info { position: absolute; bottom: 10px; left: 10px; z-index: 1000; background-color: rgba(255, 255, 255, 0.8); padding: 10px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: none; }
+        #info h2 { margin-top: 0; }
+        #info p { margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+<div id="search">
+    <input type="text" id="searchInput" placeholder="Şehir, İlçe veya Ülke">
+    <button onclick="searchLocation()">Git</button>
+</div>
+
+<div id="logo">
+    <img src="./logo.png" alt="Logo">
+</div>
+
+<div id="map"></div>
+
+<div id="info">
+    <h2>Yer Bilgileri</h2>
+    <p id="locationName"></p>
+    <p id="coordinates"></p>
+    <p id="type"></p>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.min.js"></script>
+
+<script>
+    var map = L.map('map').setView([38.4127, 27.1384], 10);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    var marker = L.marker([38.4127, 27.1384]).addTo(map);
+
+    function searchLocation() {
+        var searchText = document.getElementById('searchInput').value;
+        geocode(searchText);
+    }
+
+    function geocode(location) {
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${location}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.length > 0) {
+                    var result = data[0];
+                    var center = [result.lat, result.lon];
+                    map.setView(center, 10);
+                    marker.setLatLng(center);
+                    showLocationInfo(result);
+                } else {
+                    alert("Konum bulunamadı.");
+                }
+            })
+            .catch(error => {
+                console.error('Hata:', error);
+                alert("Konum bulunamadı.");
+            });
+    }
+
+    function showLocationInfo(location) {
+        var infoElement = document.getElementById('info');
+        var locationNameElement = document.getElementById('locationName');
+        var coordinatesElement = document.getElementById('coordinates');
+        var typeElement = document.getElementById('type');
+
+        locationNameElement.textContent = "Yer Adı: " + location.display_name;
+        coordinatesElement.textContent = "Koordinatlar: " + location.lat + ", " + location.lon;
+        typeElement.textContent = "Tür: " + location.type;
+
+        infoElement.style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
