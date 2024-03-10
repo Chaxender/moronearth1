@@ -9,6 +9,46 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-routing-machine/3.2.12/leaflet-routing-machine.css" />
     <style>
+            @media (min-width: 768px) {
+            #search { 
+                top: 50px; 
+            }
+            #info { 
+                bottom: 20px; 
+            }
+        }
+
+        /* Mobil cihazlar için stiller */
+        @media (max-width: 600px) {
+            #search { 
+                top: 50px; 
+                right: 0; 
+                left: 0; 
+                
+                padding: 15px; 
+                background-color: rgba(255, 255, 255, 0.8); 
+                box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); 
+                z-index: 1000; 
+                border-top-left-radius: 30px; 
+                border-top-right-radius: 30px; 
+            }
+            #search input[type="text"] { 
+                width: calc(100% - 80px); /* Ekran genişliği kadar olacak şekilde ayarla */
+            }
+            
+            
+            #info { 
+                bottom: 0; 
+                left: 0; 
+                width: 100%; 
+                padding: 15px; 
+                background-color: rgba(255, 255, 255, 0.8); 
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); 
+                z-index: 1000; 
+                border-bottom-left-radius: 30px; 
+                border-bottom-right-radius: 30px; 
+            }
+        }
         body { 
             font-family: Arial, sans-serif; 
             margin: 0; 
@@ -205,47 +245,60 @@
 <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
 
 <script>
-    var map = L.map('map').setView([38.4127, 27.1384], 10);
-    
+    var map = L.map('map').setView([0, 0], 10); // Başlangıçta haritayı (0,0) noktasına (Atlas Okyanusu'na) yerleştir
+
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; Monstou İnc.'
     }).addTo(map);
 
-    var marker = L.marker([38.4127, 27.1384]).addTo(map);
+    var marker = L.marker([0, 0]).addTo(map); // Başlangıçta bir işaretçi oluşturulacak, ancak henüz konum atanmadı.
 
     var trafficLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy;  <a href="https://www.youtube.com/channel/UCk3Dibt23efClCfjFawgg0Q">Monstou</a> tarafından yapıdı, Trafik yapımcısı <a href="https://{s}.tile.openstreetmap.org">OpenStreetMap</a>'
     }).addTo(map);
 
+    // Konum izni alınıyor
+    navigator.geolocation.getCurrentPosition(function(position) {
+        var userLat = position.coords.latitude;
+        var userLng = position.coords.longitude;
+
+        // Kullanıcının konumu belirlendiğinde haritayı onun konumuna taşı
+        map.setView([userLat, userLng], 10);
+
+        // Kullanıcının konumunu işaretlemek için bir işaretçi ekle
+        marker.setLatLng([userLat, userLng]);
+    });
+
     function searchLocation() {
         var searchText = document.getElementById('searchInput').value;
         geocode(searchText);
     }
+
     var destinations = []; // Hedefleri saklamak için bir dizi
 
-function addDestination() {
-    // Kullanıcının harita üzerinde tıkladığı noktanın koordinatlarını al
-    map.on('click', function(ev) {
-        var destination = ev.latlng;
-        destinations.push(destination); // Hedefleri diziye ekle
-        calculateRoute(); // Rota hesaplamak için fonksiyonu çağır
-    });
-}
+    function addDestination() {
+        // Kullanıcının harita üzerinde tıkladığı noktanın koordinatlarını al
+        map.on('click', function(ev) {
+            var destination = ev.latlng;
+            destinations.push(destination); // Hedefleri diziye ekle
+            calculateRoute(); // Rota hesaplamak için fonksiyonu çağır
+        });
+    }
 
-function calculateRoute() {
-    // Enlem ve boylam koordinatlarını al
-    var userPosition = marker.getLatLng(); // Kullanıcının konumu
-    var destination = destinations[destinations.length - 1]; // Son eklenen hedef
+    function calculateRoute() {
+        // Enlem ve boylam koordinatlarını al
+        var userPosition = marker.getLatLng(); // Kullanıcının konumu
+        var destination = destinations[destinations.length - 1]; // Son eklenen hedef
 
-    // Rota hesaplaması için Leaflet Routing Machine kullan
-    L.Routing.control({
-        waypoints: [
-            L.latLng(userPosition.lat, userPosition.lng), // Başlangıç noktası (kullanıcı konumu)
-            L.latLng(destination.lat, destination.lng) // Hedef nokta
-        ],
-        routeWhileDragging: true // Rota hesaplamayı sürüklerken de gerçekleştir
-    }).addTo(map);
-}
+        // Rota hesaplaması için Leaflet Routing Machine kullan
+        L.Routing.control({
+            waypoints: [
+                L.latLng(userPosition.lat, userPosition.lng), // Başlangıç noktası (kullanıcı konumu)
+                L.latLng(destination.lat, destination.lng) // Hedef nokta
+            ],
+            routeWhileDragging: true // Rota hesaplamayı sürüklerken de gerçekleştir
+        }).addTo(map);
+    }
 
     function geocode(location) {
         fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${location}`)
@@ -264,7 +317,6 @@ function calculateRoute() {
                     // En kısa rotayı hesapla
                     L.Routing.control({
                         waypoints: [
-                            L.latLng(38.4127, 27.1384), // Başlangıç noktası
                             L.latLng(result.lat, result.lon) // Hedef nokta
                         ]
                     }).addTo(map);
@@ -300,20 +352,19 @@ function calculateRoute() {
                 console.error('Hata:', error);
             });
     }
-function showLocationInfo(location) {
-    var infoElement = document.getElementById('info');
-    var locationNameElement = document.getElementById('locationName');
-    var coordinatesElement = document.getElementById('coordinates');
-    var typeElement = document.getElementById('type');
 
-    locationNameElement.textContent = "Yer Adı: " + location.display_name;
-    coordinatesElement.textContent = "Koordinatlar: " + location.lat + ", " + location.lon;
-    typeElement.textContent = "Tür: " + location.type;
+    function showLocationInfo(location) {
+        var infoElement = document.getElementById('info');
+        var locationNameElement = document.getElementById('locationName');
+        var coordinatesElement = document.getElementById('coordinates');
+        var typeElement = document.getElementById('type');
 
-    infoElement.style.display = 'block';
-}
+        locationNameElement.textContent = "Yer Adı: " + location.display_name;
+        coordinatesElement.textContent = "Koordinatlar: " + location.lat + ", " + location.lon;
+        typeElement.textContent = "Tür: " + location.type;
 
-
+        infoElement.style.display = 'block';
+    }
 
     function toggleTraffic() {
         if (map.hasLayer(trafficLayer)) {
