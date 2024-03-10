@@ -9,22 +9,119 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-routing-machine/3.2.12/leaflet-routing-machine.css" />
     <style>
-            @media (min-width: 768px) {
-            #search { 
-                top: 50px; 
-            }
-            #info { 
-                bottom: 20px; 
-            }
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background-color: #f8f9fa; 
+            overflow-x: hidden; 
         }
 
-        /* Mobil cihazlar için stiller */
+        .container-fluid { 
+            padding: 0; 
+            margin: 0; 
+        }
+
+        #map { 
+            height: 100vh; 
+        }
+
+        .navbar {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px; 
+        }
+
+        .navbar-nav .nav-link {
+            color: #343a40;
+        }
+
+        .navbar-toggler-icon {
+            background-color: #343a40;
+        }
+
+        #logo { 
+            position: absolute; 
+            top: 50%;
+            right: 1cm; 
+            transform: translateY(-50%); 
+            z-index: 1000; 
+            animation: fade-in 1s ease-out forwards; 
+        }
+
+        #logo img { 
+            width: 100px; 
+            height: 100px;
+            transform: rotateY(0deg); 
+            transition: transform 1s; 
+        }
+
+        #search { 
+            position: absolute; 
+            top: 21cm; 
+            right: 20px; 
+            z-index: 1000; 
+            background-color: rgba(255, 255, 255, 0.8); 
+            padding: 10px; 
+            border-radius: 20px; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+            animation: slide-in-top 0.5s ease-out forwards; 
+        }
+
+        #search input[type="text"] { 
+            width: calc(100% - 80px); 
+            padding: 10px; 
+            border: none; 
+            border-radius: 20px; 
+            margin-right: 10px; 
+            font-size: 16px; 
+        }
+
+        #search button { 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 20px; 
+            background-color: #007BFF; 
+            color: white; 
+            cursor: pointer; 
+            font-size: 16px; 
+        }
+
+        #info { 
+            position: absolute; 
+            bottom: 20px; 
+            left: 20px; 
+            z-index: 1000; 
+            background-color: rgba(255, 255, 255, 0.8); 
+            padding: 20px; 
+            border-radius: 20px; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+            display: none; 
+            animation: slide-in-bottom 0.5s ease-out forwards; 
+        }
+
+        #info h2 { 
+            margin-top: 0; 
+            margin-bottom: 20px; 
+            font-size: 20px; 
+        }
+
+        #info p { 
+            margin-bottom: 10px; 
+            font-size: 16px; 
+        }
+
+        #close-info {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+
         @media (max-width: 600px) {
             #search { 
                 top: 50px; 
                 right: 0; 
                 left: 0; 
-                
                 padding: 15px; 
                 background-color: rgba(255, 255, 255, 0.8); 
                 box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); 
@@ -32,10 +129,10 @@
                 border-top-left-radius: 30px; 
                 border-top-right-radius: 30px; 
             }
+
             #search input[type="text"] { 
-                width: calc(100% - 80px); /* Ekran genişliği kadar olacak şekilde ayarla */
+                width: calc(100% - 80px); 
             }
-            
             
             #info { 
                 bottom: 0; 
@@ -49,120 +146,6 @@
                 border-bottom-right-radius: 30px; 
             }
         }
-        body { 
-            font-family: Arial, sans-serif; 
-            margin: 0; 
-            padding: 0; 
-            background-color: #f8f9fa; 
-            overflow-x: hidden; 
-        }
-        .container-fluid { 
-            padding: 0; 
-            margin: 0; 
-        }
-        #map { 
-            height: calc(100vh - 56px); /* Navbar yüksekliği kadar azalt */
-        }
-        #search { 
-            position: absolute; 
-            top: 23cm; 
-            right: 20px; 
-            z-index: 1000; 
-            background-color: rgba(255, 255, 255, 0.8); 
-            padding: 10px; 
-            border-radius: 20px; 
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
-            animation: slide-in-top 0.5s ease-out forwards; 
-        }
-        #search input[type="text"] { 
-            width: 200px; 
-            padding: 10px; 
-            border: none; 
-            border-radius: 20px; 
-            margin-right: 10px; 
-            font-size: 16px; 
-        }
-        .photos-container {
-    width: 100%; /* Kutunun genişliği */
-    display: flex; /* Fotoğrafları yan yana hizalamak için flex kullanın */
-    flex-wrap: wrap; /* Fotoğraflar satır sonunda alt satıra geçsin */
-    justify-content: flex-start; /* Fotoğrafları soldan başlayarak hizala */
-}
-
-.photosmap {
-    width: calc(33.33% - 20px); /* Kutunun genişliğinin 1/3'ü olacak şekilde ayarla ve kenar boşluğunu çıkar */
-    margin: 10px; /* Fotoğraflar arasındaki boşluk */
-    border: 1px solid #ddd; /* Fotoğraflar arasına ince bir kenarlık ekle */
-    border-radius: 5px; /* Köşeleri yuvarla */
-    overflow: hidden; /* Taşan içeriği gizle */
-    display: flex; /* İçerikleri dikey olarak hizalamak için flex kullanın */
-    flex-direction: column; /* İçerikleri dikey olarak hizala */
-}
-
-.photosmap img {
-    max-width: 100%; /* Resmin maksimum genişliği %100 olacak şekilde ayarlayın */
-    max-height: calc(100% - 30px); /* Resmin maksimum yüksekliği, kutunun yüksekliğinden 30 piksel eksik olacak şekilde ayarlayın */
-    flex: 1; /* Resimleri esnek olarak ayarlayın */
-    object-fit: cover; /* Resmi kutuya sığacak şekilde ölçeklendirin */
-}
-
-
-        #search button { 
-            padding: 10px 20px; 
-            border: none; 
-            border-radius: 20px; 
-            background-color: #007BFF; 
-            color: white; 
-            cursor: pointer; 
-            font-size: 16px; 
-        }
-        #logo { 
-            position: absolute; 
-            top: 50%; /* Navbar yüksekliğinin yarısı kadar yukarıda */
-            right: 1cm; 
-            transform: translateY(-50%); /* Logoyu dikey olarak ortala */
-            z-index: 1000; 
-            animation: fade-in 1s ease-out forwards; 
-        }
-        #logo img { 
-            width: 100px; 
-            height: 100px;
-            transform: rotateY(0deg); /* Initial rotation */
-            transition: transform 1s; /* Smooth transition for rotation */
-        }
-        #info { 
-            position: absolute; 
-            bottom: 20px; 
-            left: 20px; 
-            z-index: 1000; 
-            background-color: rgba(255, 255, 255, 0.8); 
-            padding: 20px; 
-            border-radius: 20px; 
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
-            display: none; 
-            animation: slide-in-bottom 0.5s ease-out forwards; 
-        }
-        #info h2 { 
-            margin-top: 0; 
-            margin-bottom: 20px; 
-            font-size: 20px; 
-        }
-        #info p { 
-            margin-bottom: 10px; 
-            font-size: 16px; 
-        }
-        .navbar {
-            background-color: rgba(255, 255, 255, 0.9); /* Hafifçe saydam beyaz arka plan */
-            border-radius: 15px; /* Köşeleri yuvarla */
-        }
-
-        .navbar-nav .nav-link {
-            color: #343a40; /* Yazı ve simge rengi */
-        }
-
-        .navbar-toggler-icon {
-            background-color: #343a40; /* Menü simgesi rengi */
-        }
 
         @keyframes slide-in-top { 
             0% { 
@@ -172,6 +155,7 @@
                 transform: translateY(0); 
             } 
         }
+
         @keyframes slide-in-bottom { 
             0% { 
                 transform: translateY(100%); 
@@ -180,6 +164,7 @@
                 transform: translateY(0); 
             } 
         }
+
         @keyframes fade-in { 
             0% { 
                 opacity: 0; 
@@ -224,19 +209,18 @@
         <input type="text" id="searchInput" placeholder="Şehir, İlçe veya Ülke">
         <button class="btn btn-primary" onclick="searchLocation()">Git</button>
         <button class="btn btn-primary" onclick="addDestination()">Hedef Ekle</button>
-
     </div>
 
     <div id="info">
+        <span id="close-info" onclick="closeInfo()">❌</span>
         <h2>Yer Bilgileri</h2>
         <div class="photos-container">
-
-            <div class="photosmap" id="photos"></div></div>
+            <div class="photosmap" id="photos"></div>
+        </div>
         <p id="locationName"></p>
         <p id="coordinates"></p>
         <p id="type"></p>
         <p id="distance"></p> <!-- Mesafe bilgisi -->
-        
     </div>
 </div>
 
@@ -299,7 +283,9 @@
             routeWhileDragging: true // Rota hesaplamayı sürüklerken de gerçekleştir
         }).addTo(map);
     }
-
+    function closeInfo() {
+        document.getElementById('info').style.display = 'none';
+    }
     function geocode(location) {
         fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${location}`)
             .then(response => response.json())
