@@ -1,386 +1,121 @@
 <!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moron Navigasyon</title>
-    <link rel="icon" href="./img/logo.png" type="image/png">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-routing-machine/3.2.12/leaflet-routing-machine.css" />
-    <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            margin: 0; 
-            padding: 0; 
-            background-color: #f8f9fa; 
-            overflow-x: hidden; 
-        }
-
-        .container-fluid { 
-            padding: 0; 
-            margin: 0; 
-        }
-
-        #map { 
-            height: 100vh; 
-        }
-
-        .navbar {
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 15px; 
-        }
-
-        .navbar-nav .nav-link {
-            color: #343a40;
-        }
-
-        .navbar-toggler-icon {
-            background-color: #343a40;
-        }
-
-        #logo { 
-            position: absolute; 
-            top: 50%;
-            right: 1cm; 
-            transform: translateY(-50%); 
-            z-index: 1000; 
-            animation: fade-in 1s ease-out forwards; 
-        }
-
-        #logo img { 
-            width: 100px; 
-            height: 100px;
-            transform: rotateY(0deg); 
-            transition: transform 1s; 
-        }
-
-        #search { 
-            position: absolute; 
-            top: 21cm; 
-            right: 20px; 
-            z-index: 1000; 
-            background-color: rgba(255, 255, 255, 0.8); 
-            padding: 10px; 
-            border-radius: 20px; 
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
-            animation: slide-in-top 0.5s ease-out forwards; 
-        }
-
-        #search input[type="text"] { 
-            width: calc(100% - 80px); 
-            padding: 10px; 
-            border: none; 
-            border-radius: 20px; 
-            margin-right: 10px; 
-            font-size: 16px; 
-        }
-
-        #search button { 
-            padding: 10px 20px; 
-            border: none; 
-            border-radius: 20px; 
-            background-color: #007BFF; 
-            color: white; 
-            cursor: pointer; 
-            font-size: 16px; 
-        }
-
-        #info { 
-            position: absolute; 
-            bottom: 20px; 
-            left: 20px; 
-            z-index: 1000; 
-            background-color: rgba(255, 255, 255, 0.8); 
-            padding: 20px; 
-            border-radius: 20px; 
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
-            display: none; 
-            animation: slide-in-bottom 0.5s ease-out forwards; 
-        }
-
-        #info h2 { 
-            margin-top: 0; 
-            margin-bottom: 20px; 
-            font-size: 20px; 
-        }
-
-        #info p { 
-            margin-bottom: 10px; 
-            font-size: 16px; 
-        }
-
-        #close-info {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            cursor: pointer;
-        }
-
-        @media (max-width: 600px) {
-            #search { 
-                top: 50px; 
-                right: 0; 
-                left: 0; 
-                padding: 15px; 
-                background-color: rgba(255, 255, 255, 0.8); 
-                box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); 
-                z-index: 1000; 
-                border-top-left-radius: 30px; 
-                border-top-right-radius: 30px; 
-            }
-
-            #search input[type="text"] { 
-                width: calc(100% - 80px); 
-            }
-            
-            #info { 
-                bottom: 0; 
-                left: 0; 
-                width: 100%; 
-                padding: 15px; 
-                background-color: rgba(255, 255, 255, 0.8); 
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); 
-                z-index: 1000; 
-                border-bottom-left-radius: 30px; 
-                border-bottom-right-radius: 30px; 
-            }
-        }
-
-        @keyframes slide-in-top { 
-            0% { 
-                transform: translateY(-100%); 
-            } 
-            100% { 
-                transform: translateY(0); 
-            } 
-        }
-
-        @keyframes slide-in-bottom { 
-            0% { 
-                transform: translateY(100%); 
-            } 
-            100% { 
-                transform: translateY(0); 
-            } 
-        }
-
-        @keyframes fade-in { 
-            0% { 
-                opacity: 0; 
-            } 
-            100% { 
-                opacity: 1; 
-            } 
-        }
-    </style>
-</head>
-<body>
-
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-
-  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
-        <a class="nav-link" href="#">Anasayfa <span class="sr-only">(current)</span></a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="./info.html">Hakkımızda</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="./iletişim.html">İletişim</a>
-      </li>
-      
-      <div id="logo">
-        <img src="./img/logo.png" alt="Logo" id="logoImg">
-      </div>
-      
-    </ul>
-  </div>
-</nav>
-
-<div class="container-fluid">
-    <div id="map"></div>
-
-    <div id="search">
-        <input type="text" id="searchInput" placeholder="Şehir, İlçe veya Ülke">
-        <button class="btn btn-primary" onclick="searchLocation()">Git</button>
-        <button class="btn btn-primary" onclick="addDestination()">Hedef Ekle</button>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>İskender Cem Demirtaş</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body>
+    <div class="scroll-button">
+      <a href="#home"><i class="fas fa-arrow-up"></i></a>
     </div>
-
-    <div id="info">
-        <span id="close-info" onclick="closeInfo()">❌</span>
-        <h2>Yer Bilgileri</h2>
-        <div class="photos-container">
-            <div class="photosmap" id="photos"></div>
+    <nav>
+      <div class="navbar">
+        <div class="logo"><a href="#">İCD - Portfolyo</a></div>
+        <ul class="menu">
+          <li><a href="#home">Ana Sayfa</a></li>
+          <li><a href="#about">Hakkımda</a></li>
+          <li><a href="#projects">Projelerim</a></li>
+          <div class="cancel-btn">
+            <i class="fas fa-times"></i>
+          </div>
+        </ul>
+        <div class="media-icons">
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
         </div>
-        <p id="locationName"></p>
-        <p id="coordinates"></p>
-        <p id="type"></p>
-        <p id="distance"></p> <!-- Mesafe bilgisi -->
-    </div>
-</div>
+      </div>
+      <div class="menu-btn">
+        <i class="fas fa-bars"></i>
+      </div>
+    </nav>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+    <!-- Home Section Start -->
+    <section class="home" id="home">
+      <div class="home-content">
+        <div class="text">
+          <div class="text-one">Ben,</div>
+          <div class="text-two">İskender Cem <br> Demirtaş</div>
+          <div class="text-three">Video İçeriği <br> Üreticisi</div>
+        </div>
+        <div class="button">
+          <a href="#about"><button>Ben Kimim?</button></a>
+        </div>
+      </div>
+    </section>
 
-<script>
-    var map = L.map('map').setView([0, 0], 10); // Başlangıçta haritayı (0,0) noktasına (Atlas Okyanusu'na) yerleştir
+    <section class="about" id="about">
+      <div class="content">
+        <div class="title"><span>Hakkımda</span></div>
+        <div class="about-details">
+          <div class="left">
+            <img src="./images/image2.png" alt="" />
+          </div>
+          <div class="right">
+            <div class="topic">Yapımcılıkla Uğraşıyorum.</div>
+            <p>
+              Bu sektörde 10 yıl deneyime sahip biri olarak, kameramanlık ile şarkıcıların kliplerini çekmekten sonra uzun süre sonra yapımcı oldum.
+            </p>
+            <div class="button">
+              <a href="https://www.instagram.com/cemdmrtas?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="><button>Çalışmalarımı Paylaştığım <br>
+            İnstagramıma Git!</button></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="projects" id="projects">
+      <div class="content">
+        <div class="title"><span>Yaptığım Bazı Çalışmalar</span></div>
+        <div class="skills-details">
+          <div class="text">
+            <div class="topic">Yapımında Yer Aldığım Klipler</div>
+            <img class="proje" src="./images/didomido.png" alt="">
+            <h2>Didomido - Tehlikeli</h2>
+             <div class="button">
+                <a href="https://www.youtube.com/watch?v=rDZRBLDIymc&pp=ygUSdGVobGlrZWxpIGRpZG9taWRv"><button>Klibi İzle</button></a>
+            </div>
+            <br>
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; Monstou İnc.'
-    }).addTo(map);
+            <img class="proje" src="./images/mavi.png" alt="">
+            <h2>Mavi - Sen ve Yıldız</h2>
+            <div class="button">
+                <a href="https://www.youtube.com/watch?v=fQwtpRj8V64&pp=ygUPc2VuIHZlIHnEsWxkxLF6"><button>Klibi İzle</button></a>
+            </div>
+            <br>
 
-    var marker = L.marker([0, 0]).addTo(map); // Başlangıçta bir işaretçi oluşturulacak, ancak henüz konum atanmadı.
+            <img class="proje" src="./images/reynmenbilal.png" alt="">
+            <h1>Reynmen & Bilal Sonses - Tavrına Hayran</h1>
 
-    var trafficLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy;  <a href="https://www.youtube.com/channel/UCk3Dibt23efClCfjFawgg0Q">Monstou</a> tarafından yapıdı, Trafik yapımcısı <a href="https://{s}.tile.openstreetmap.org">OpenStreetMap</a>'
-    }).addTo(map);
+            <div class="button">
+                <a href="https://www.youtube.com/watch?v=rHStnEmBb3E"><button>Klibi İzle</button></a>
+            </div>
 
-    // Konum izni alınıyor
-    navigator.geolocation.getCurrentPosition(function(position) {
-        var userLat = position.coords.latitude;
-        var userLng = position.coords.longitude;
+            <br>
+            <br>
 
-        // Kullanıcının konumu belirlendiğinde haritayı onun konumuna taşı
-        map.setView([userLat, userLng], 10);
+            <div class="experience">
+              <div class="num">10</div>
+              <div class="exp">
+                Yıldır <br />
+                Bu İşi Yapıyorum
+              </div>
+            </div>
+          </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-        // Kullanıcının konumunu işaretlemek için bir işaretçi ekle
-        marker.setLatLng([userLat, userLng]);
-    });
+    <footer>
+      <div class="text">
+        <span>Yapımcı <a href="https://www.youtube.com/channel/UCk3Dibt23efClCfjFawgg0Q">Kıvanç Sadi Kılıç</a> | &#169; 2024 İskender Cem Demirtaş Portfolyo</span>
+      </div>
+    </footer>
 
-    function searchLocation() {
-        var searchText = document.getElementById('searchInput').value;
-        geocode(searchText);
-    }
-
-    var destinations = []; // Hedefleri saklamak için bir dizi
-
-    function addDestination() {
-        // Kullanıcının harita üzerinde tıkladığı noktanın koordinatlarını al
-        map.on('click', function(ev) {
-            var destination = ev.latlng;
-            destinations.push(destination); // Hedefleri diziye ekle
-            calculateRoute(); // Rota hesaplamak için fonksiyonu çağır
-        });
-    }
-
-    function calculateRoute() {
-        // Enlem ve boylam koordinatlarını al
-        var userPosition = marker.getLatLng(); // Kullanıcının konumu
-        var destination = destinations[destinations.length - 1]; // Son eklenen hedef
-
-        // Rota hesaplaması için Leaflet Routing Machine kullan
-        L.Routing.control({
-            waypoints: [
-                L.latLng(userPosition.lat, userPosition.lng), // Başlangıç noktası (kullanıcı konumu)
-                L.latLng(destination.lat, destination.lng) // Hedef nokta
-            ],
-            routeWhileDragging: true // Rota hesaplamayı sürüklerken de gerçekleştir
-        }).addTo(map);
-    }
-    function closeInfo() {
-        document.getElementById('info').style.display = 'none';
-    }
-    function geocode(location) {
-        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${location}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data && data.length > 0) {
-                    var result = data[0];
-                    var center = [result.lat, result.lon];
-                    map.setView(center, 10);
-                    marker.setLatLng(center);
-                    showLocationInfo(result);
-
-                    // Konuma ait fotoğrafları getir
-                    getPhotos(location);
-
-                    // En kısa rotayı hesapla
-                    L.Routing.control({
-                        waypoints: [
-                            L.latLng(result.lat, result.lon) // Hedef nokta
-                        ]
-                    }).addTo(map);
-
-                    // Logo döndürme animasyonu
-                    var logoImg = document.getElementById('logoImg');
-                    logoImg.style.transform = "rotateY(360deg)";
-                } else {
-                    alert("Konum bulunamadı.");
-                }
-            })
-            .catch(error => {
-                console.error('Hata:', error);
-                alert("Konum bulunamadı.");
-            });
-    }
-
-    function getPhotos(location) {
-        fetch(`https://api.unsplash.com/search/photos?client_id=rgeVo4BaJdC--bImTL7gWALUgrUqtzsZ8hed7kVsLiU&query=${location}&per_page=3`)
-            .then(response => response.json())
-            .then(data => {
-                var photoContainer = document.getElementById('photos');
-                photoContainer.innerHTML = ''; // Önceki fotoğrafları temizle
-
-                data.results.forEach(photo => {
-                    var imgElement = document.createElement('img');
-                    imgElement.src = photo.urls.small;
-                    imgElement.alt = photo.alt_description;
-                    photoContainer.appendChild(imgElement);
-                });
-            })
-            .catch(error => {
-                console.error('Hata:', error);
-            });
-    }
-
-    function showLocationInfo(location) {
-        var infoElement = document.getElementById('info');
-        var locationNameElement = document.getElementById('locationName');
-        var coordinatesElement = document.getElementById('coordinates');
-        var typeElement = document.getElementById('type');
-
-        locationNameElement.textContent = "Yer Adı: " + location.display_name;
-        coordinatesElement.textContent = "Koordinatlar: " + location.lat + ", " + location.lon;
-        typeElement.textContent = "Tür: " + location.type;
-
-        infoElement.style.display = 'block';
-    }
-
-    function toggleTraffic() {
-        if (map.hasLayer(trafficLayer)) {
-            map.removeLayer(trafficLayer);
-        } else {
-            trafficLayer.addTo(map);
-        }
-    }
-
-    // Sağ tıklama olayı dinleyicisi
-    map.on('contextmenu', function(ev) {
-        var markerPosition = ev.latlng; // Tıklanan noktanın koordinatları
-        var userPosition = marker.getLatLng(); // Kullanıcının konumunun koordinatları
-
-        var distance = userPosition.distanceTo(markerPosition); // İki nokta arasındaki mesafe (metre cinsinden)
-        var distanceInKm = (distance / 1000).toFixed(2); // Mesafeyi kilometre cinsine çevirip 2 ondalık basamağa yuvarla
-
-        var distanceElement = document.getElementById('distance');
-        distanceElement.textContent = "Mesafe: " + distanceInKm + " km"; // Mesafe bilgisini ekrana yazdır
-    });
-
-    // "Enter" tuşuna basılınca da arama yap
-    document.getElementById("searchInput").addEventListener("keyup", function(event) {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            searchLocation();
-        }
-    });
-
-</script>
-
-</body>
+    <script src="script.js"></script>
+  </body>
 </html>
